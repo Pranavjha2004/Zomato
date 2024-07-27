@@ -1,41 +1,98 @@
-import { createPortal } from 'react-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
+import styles from './Signup.module.css';
 
-import gLogo from '/images/google.png';
-import mailLogo from '/images/emailIcon.jpg';
-import closeBtn from '/images/closeBtn.jpg';
+const Signup = () => {
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [bio, setBio] = useState('');
+  const [location, setLocation] = useState('');
 
-import signupCss from './Signup.module.css';
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('http://localhost:3000/users', {
+        name, phone, email, password, profile: { avatar, bio, location }
+      });
+      alert('User registered successfully!');
+    } catch (error) {
+      console.error('Error signing up', error);
+    }
+  };
 
-let Signup = ({ setAuth }) => {
-    let loginDiv = <div className={signupCss.outerDiv}>
-        <div className={signupCss.modal}>
-            <div className={signupCss.header}>
-                <span className={signupCss.ttl}>Signup</span>
-                <span className={signupCss.closeBtn} onClick={() => setAuth({ closed: true, login: false, signup: false })}>
-                    <img className={signupCss.closeBtnImg} src={closeBtn} alt="close button" />
-                </span>
-            </div>
-            <div className={signupCss.lgBox}>
-                <input className={signupCss.inpBox} type="text" placeholder='Full Name ...' />
-                <input className={signupCss.inpBox} type="email" placeholder='Email ...' />
-                <span className={signupCss.termsTxt}>
-                    <input type="checkbox" name="accpect" id="accpect" className={signupCss.checkBox} />
-                    <span>
-                        I agree to Zomato's <a href="" className={signupCss.termaAnchor}>Terms of Service, Privacy Policy</a> and <a href="" className={signupCss.termaAnchor}>Content Policies</a>
-                    </span>
-                </span>
-                <button className={signupCss.btn}>Create Account</button>
-            </div>
-            <div className={signupCss.orBreak}><span className={signupCss.orBreakText}>or</span></div>
-            <div className={signupCss.socialSignupBox}>
-                <img className={signupCss.icon} src={gLogo} alt="google login" />
-                Continue with Google
-            </div>
-            <hr className={signupCss.break} />
-            <div className={signupCss.newToZomato}>Already have an account? <div className={signupCss.createAcc} onClick={() => setAuth({ closed: false, login: true, signup: false })} >Log in</div></div>
+  return (
+    <div className={styles.outerDiv}>
+      <div className={styles.modal}>
+        <div className={styles.header}>
+          <div className={styles.ttl}>Signup</div>
+          <div className={styles.closeBtn}>
+            <img className={styles.closeBtnImg} src="/path/to/close/icon.png" alt="close" />
+          </div>
         </div>
+        <div className={styles.lgBox}>
+          <form onSubmit={handleSignup}>
+            <input
+              type="text"
+              className={styles.inpBox}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              required
+            />
+            <input
+              type="text"
+              className={styles.inpBox}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter your phone number"
+              required
+            />
+            <input
+              type="email"
+              className={styles.inpBox}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+              required
+            />
+            <input
+              type="password"
+              className={styles.inpBox}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+            />
+            <input
+              type="text"
+              className={styles.inpBox}
+              value={avatar}
+              onChange={(e) => setAvatar(e.target.value)}
+              placeholder="Enter avatar URL"
+            />
+            <input
+              type="text"
+              className={styles.inpBox}
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              placeholder="Enter your bio"
+            />
+            <input
+              type="text"
+              className={styles.inpBox}
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Enter your location"
+            />
+            <button type="submit" className={styles.btn}>Signup</button>
+          </form>
+        </div>
+      </div>
     </div>
-    return createPortal(loginDiv, document.getElementById('modal'));
-}
+  );
+};
 
 export default Signup;

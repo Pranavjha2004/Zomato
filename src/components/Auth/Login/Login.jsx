@@ -1,45 +1,49 @@
-import {useState} from "react";
-import { createPortal } from 'react-dom';
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useHistory } from 'react-router-dom';
+import styles from './Login.module.css';
 
-import gLogo from '/images/google.png';
-import mailLogo from '/images/emailIcon.jpg';
-import closeBtn from '/images/closeBtn.jpg';
+const Login = () => {
+  const [phone, setPhone] = useState('');
+  const history = useHistory();
 
-import loginCss from './Login.module.css';
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:3000/otp', { phone });
+      if (response.status === 200) {
+        history.push('/otp', { phone });
+      }
+    } catch (error) {
+      console.error('Error logging in', error);
+    }
+  };
 
-import EnterOTP from '../../Auth/EnterOTP/EnterOTP'
-
-let Login = ({ setAuth, setLoggedIn }) => {
-    const [phone, setPhone] = useState();
-
-    let [otpModal, setOTPModal] = useState(false)
-
-    let loginDiv = !otpModal ? <div className={loginCss.outerDiv}>
-        <div className={loginCss.modal}>
-            <div className={loginCss.header}>
-                <span className={loginCss.ttl}>Login</span>
-                <span className={loginCss.closeBtn} onClick={() => setAuth({ closed: true, login: false, signup: false })}>
-                    <img className={loginCss.closeBtnImg} src={closeBtn} alt="close button" />
-                </span>
-            </div>
-            <div className={loginCss.lgBox}>
-                <input className={loginCss.phoneInp} type="tel" placeholder='Phone number ...' onChange={(e) => setPhone(e.target.value)} />
-                <button  className={phone?.length === 10 ? [loginCss.btn, loginCss.Sbtn].join(" ") : loginCss.btn} onClick={()=> phone?.length === 10 ? setOTPModal(true) : ""}>Send OTP</button>
-            </div>
-            <div className={loginCss.orBreak}><span className={loginCss.orBreakText}>or</span></div>
-            <div className={loginCss.socialSignupBox}>
-                <img className={loginCss.icon} src={mailLogo} alt="email signup" />
-                Continue with Email
-            </div>
-            <div className={loginCss.socialSignupBox}>
-                <img className={loginCss.icon} src={gLogo} alt="google signup" />
-                Continue with Google
-            </div>
-            <hr className={loginCss.break} />
-            <div className={loginCss.newToZomato}>New to Zomato? <div className={loginCss.createAcc} onClick={() => setAuth({ closed: false, login: false, signup: true })}>Create Account</div></div>
+  return (
+    <div className={styles.outerDiv}>
+      <div className={styles.modal}>
+        <div className={styles.header}>
+          <div className={styles.ttl}>Login</div>
+          <div className={styles.closeBtn}>
+            <img className={styles.closeBtnImg} src="/path/to/close/icon.png" alt="close" />
+          </div>
         </div>
-    </div> :  <EnterOTP setModal={setOTPModal} setLoggedIn={setLoggedIn} setAuth={setAuth} />
-    return createPortal(loginDiv, document.getElementById('modal'));
-}
+        <div className={styles.lgBox}>
+          <form onSubmit={handleLogin}>
+            <input
+              type="text"
+              className={styles.phoneInp}
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Enter your phone number"
+              required
+            />
+            <button type="submit" className={`${styles.btn} ${styles.Sbtn}`}>Send OTP</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Login;

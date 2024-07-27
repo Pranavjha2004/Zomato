@@ -1,74 +1,58 @@
-import {useEffect, useState} from 'react';
-import { createPortal } from 'react-dom'
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useHistory, useLocation } from 'react-router-dom';
+import styles from './EnterOTP.module.css';
 
-import closeBtn from '/images/closeBtn.jpg';
+const EnterOTP = () => {
+  const [otp, setOtp] = useState('');
+  const history = useHistory();
+  const location = useLocation();
 
-import css from './EnterOTP.module.css'
-
-let EnterOTP = ({setModal, setLoggedIn = () => {}, setAuth = () => {}}) => {
-
-    let [count, setCount] = useState(60);
-
-    const loginHandler = ()=> {
-        setModal(false); 
-        setLoggedIn(true);
-        setAuth(false);
-        localStorage.setItem("auth", true);
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    const { phone } = location.state;
+    try {
+      const response = await axios.post('http://localhost:3000/verify-otp', { phone, otp });
+      if (response.status === 200) {
+        history.push('/profile');
+      }
+    } catch (error) {
+      console.error('Error verifying OTP', error);
     }
+  };
 
-    useEffect(()=>{
-        if (!count) return;
-
-        let interval = setInterval(()=>{
-            if(count > 0){
-                setCount(val => val - 1);
-            }
-        }, [1000])
-    
-        return () => clearInterval(interval);
-
-    }, [count])
-
-    const domObj = <div className={css.outerDiv}>
-        <div className={css.innerDiv}>
-            <div className={css.header}>
-                <div className={css.title}>Enter OTP</div>
-                <span className={css.closeBtn} onClick={() => setModal(false)}>
-                    <img className={css.closeBtnImg} src={closeBtn} alt="close button" />
-                </span>
-            </div>
-            <div className={css.body}>
-                <div className={css.txt1}>OTP send successfully</div>
-                <div className={css.OTPBox}>
-                    <div className={css.otpNumBox}>
-                        <input className={css.inpBox} type="text" name="" id="" maxLength="1" defaultValue="2" />
-                    </div>
-                    <div className={css.otpNumBox}>
-                        <input className={css.inpBox} type="text" name="" id="" maxLength="1" defaultValue="2" />
-                    </div>
-                    <div className={css.otpNumBox}>
-                        <input className={css.inpBox} type="text" name="" id="" maxLength="1" defaultValue="2" />
-                    </div>
-                    <div className={css.otpNumBox}>
-                        <input className={css.inpBox} type="text" name="" id="" maxLength="1" defaultValue="2" />
-                    </div>
-                    <div className={css.otpNumBox}>
-                        <input className={css.inpBox} type="text" name="" id="" maxLength="1" defaultValue="2" />
-                    </div>
-                    <div className={css.otpNumBox}>
-                        <input className={css.inpBox} type="text" name="" id="" maxLength="1" defaultValue="2" />
-                    </div>
-                </div>
-                <div onClick={loginHandler} className={css.okBtn}>OK</div>
-                <div className={css.footerBox}>
-                    <div className={css.time}>Time: {count}</div>
-                    <div className={css.footerTxt}>Didn't receive OTP? <span className={css.resendTxt} onClick={() => setCount(60)}>Resend Now</span></div>
-                </div>
-            </div>
+  return (
+    <div className={styles.outerDiv}>
+      <div className={styles.innerDiv}>
+        <div className={styles.header}>
+          <div className={styles.title}>Enter OTP</div>
+          <div className={styles.closeBtn}>
+            <img className={styles.closeBtnImg} src="/path/to/close/icon.png" alt="close" />
+          </div>
         </div>
+        <div className={styles.body}>
+          <div className={styles.txt1}>We have sent an OTP to your phone</div>
+          <form onSubmit={handleVerifyOTP} className={styles.OTPBox}>
+            <input
+              type="text"
+              className={styles.inpBox}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP"
+              required
+            />
+            <button type="submit" className={styles.okBtn}>Verify OTP</button>
+          </form>
+        </div>
+        <div className={styles.footerBox}>
+          <div className={styles.time}>00:30</div>
+          <div className={styles.footerTxt}>
+            Didn't receive the OTP? <span className={styles.resendTxt}>Resend</span>
+          </div>
+        </div>
+      </div>
     </div>
-
-    return createPortal(domObj, document.getElementById('modal'));
-}
+  );
+};
 
 export default EnterOTP;

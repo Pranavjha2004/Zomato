@@ -1,69 +1,43 @@
-import css from './User.module.css'
-
-import Navbar from '../../components/Navbars/NavigationBar2/NavigationBar2'
-import UserProfileRightsideBar from '../../components/UserProfileComponents/UserProfileRightsideBar/UserProfileRightsideBar'
-
-import UserHero from '../../utils/UserProfileUtils/UserHero/UserHero'
-import LeftSideCardPanel from '../../utils/Cards/LeftSideCardPanel/LeftSideCardPanel'
-import SuggestedFollowCard from '../../utils/UserProfileUtils/SuggestedFollowCard/SuggestedFollowCard'
-import ProfileWidget from '../../utils/UserProfileUtils/ProfileWidget/ProfileWidget'
-
-import userImg from '/images/koushil.jpg';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import styles from './User.module.css';
 
 const User = () => {
+  const [userData, setUserData] = useState(null);
 
-    let data1 = [ 
-        {title: "Reviews", hash: "reviews"},
-        {title: "Photos", hash: "photos"},
-        {title: "Followers", hash: "followers"},
-        {title: "Recently Viewed", hash: "recently-viewed"},
-        {title: "Bookmarks", hash: "bookmarks"},
-        {title: "Blog Posts", hash: "blog-posts"}
-    ];
-    let data2 = [ 
-        {title: "Order History", hash: "order-history"},
-        {title: "My Address", hash: "my-address"},
-        {title: "Favorite Orders", hash: "favorite-orders"},
-    ];
-    let data5 = [ 
-        {title: "Yours Booking", hash: "bookings"},
-    ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/users/1'); // Fetch user data by ID
+        setUserData(response.data);
+      } catch (error) {
+        console.error('Error fetching user data', error);
+      }
+    };
 
-    let data3 = [
-        {userId: 123, imgSrc:userImg, userName: "Koushil Mankali", reviews: 200, followers: "123"},
-        {userId: 123, imgSrc:userImg, userName: "Koushil Mankali", reviews: 200, followers: "123"},
-        {userId: 123, imgSrc:userImg, userName: "Koushil Mankali", reviews: 200, followers: "123"},
-        {userId: 123, imgSrc:userImg, userName: "Koushil Mankali", reviews: 200, followers: "123"}
-    ]
+    fetchData();
+  }, []);
 
-    let data4 = {
-      profilePic: userImg,
-      userName: "Koushil",
-      reviews: 1,
-      photos: 1,
-      followers: 200
-    }
+  if (!userData) {
+    return <div>Loading...</div>;
+  }
 
-  return (<div className={css.outerDiv}>
-    <div className={css.navbar}>
-      <Navbar />
-    </div>
-    <div className={css.box}>
-      <UserHero />
-      <div className={css.mainbody}>
-        <div className={css.leftBox}>
-          <LeftSideCardPanel name='ACTIVITY' data={data1} />
-          <LeftSideCardPanel name='ONLINE ORDERING' data={data2} />
-          <LeftSideCardPanel name='TABLE BOOKING' data={data5} />
-          <SuggestedFollowCard name='SUGGESTED FOODIES TO FOLLOW' data={data3} />
-          <ProfileWidget name='ZOMATO PROFILE WIDGET' tag="Showcase your Zomato profile on your blog." data={data4} />
-        </div>
-        <div className={css.rightBox}>
-          <UserProfileRightsideBar />
+  return (
+    <div className={styles.outerDiv}>
+      <div className={styles.navbar}>Navbar Component</div>
+      <div className={styles.box}>
+        <div className={styles.mainbody}>
+          <div className={styles.leftBox}>Left Side Content</div>
+          <div className={styles.rightBox}>
+            <h1>{userData.name}</h1>
+            <p>{userData.email}</p>
+            <p>{userData.profile.bio}</p>
+            <p>{userData.profile.location}</p>
+          </div>
         </div>
       </div>
     </div>
-  </div>)
-}
+  );
+};
 
-export default User
+export default User;
